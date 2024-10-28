@@ -78,12 +78,12 @@ def _check_file_matches_filters(file_name, file_size, file_creation_time, search
         return False
 
     # Проверка размера файла
-    if search.size_value and not __comprasion_by_wildcards(search.size_value, search.size_operator, file_size):
+    if search.size_value and not _comprasion_by_wildcards(search.size_value, search.size_operator, file_size):
         return False
 
     # Проверка времени создания файла
     if search.creation_time_value and file_creation_time:
-        if not __comprasion_by_wildcards(search.creation_time_value, search.creation_time_operator, file_creation_time):
+        if not _comprasion_by_wildcards(search.creation_time_value, search.creation_time_operator, file_creation_time):
             return False
 
     return True
@@ -102,7 +102,7 @@ def _check_contains_text(file_content, search_text):
     return True
 
 
-def __comprasion_by_wildcards(border_value, operator, value):
+def _comprasion_by_wildcards(border_value, operator, value):
     operators = {
         "eq": value == border_value,
         "gt": value > border_value,
