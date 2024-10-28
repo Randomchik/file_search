@@ -10,7 +10,7 @@ import {
   Col,
 } from "antd"
 import { useAppDispatch } from "../app/hooks"
-import { createNewSearch } from "../features/searchSlice"
+import { createNewSearch, SearchRequest } from "../features/searchSlice"
 
 const { Option } = Select
 
@@ -18,7 +18,14 @@ const SearchForm: React.FC = () => {
   const dispatch = useAppDispatch()
   const [form] = Form.useForm()
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: Omit<SearchRequest, 'id' | 'finished'>) => {
+    // Инициализируем оператор если не задан
+    if (values.size?.value && !values.size?.operator) {
+        values.size.operator = 'eq'
+    }
+    if (values.creation_time?.value && !values.creation_time?.operator) {
+        values.creation_time.operator = 'eq'
+    }
     dispatch(createNewSearch(values))
     // form.resetFields();
   }
@@ -45,7 +52,7 @@ const SearchForm: React.FC = () => {
         </Col>
         <Col span={12}>
           <Form.Item name={["size", "operator"]} label="Size Operator">
-            <Select>
+            <Select defaultValue="eq">
               <Option value="gt">Greater than</Option>
               <Option value="lt">Less than</Option>
               <Option value="ge">Greater or Equal</Option>
@@ -66,7 +73,7 @@ const SearchForm: React.FC = () => {
             name={["creation_time", "operator"]}
             label="Creation Operator"
           >
-            <Select>
+            <Select defaultValue="eq">
               <Option value="gt">After</Option>
               <Option value="lt">Before</Option>
               <Option value="ge">After or Exact</Option>

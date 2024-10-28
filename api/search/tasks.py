@@ -1,5 +1,6 @@
 import os
 import zipfile
+import pytz
 from threading import Thread
 from datetime import datetime
 from fnmatch import fnmatch  
@@ -9,7 +10,10 @@ from pathlib import PureWindowsPath
 from .models import Search
 
 
-def start_search_thread(search_id):
+utc=pytz.UTC
+
+
+def start_search_thread(search_id: str):
     """
     Функция для запуска задачи поиска в отдельном потоке.
     """
@@ -17,7 +21,7 @@ def start_search_thread(search_id):
     thread.start()
 
 
-def search_files(search_id):
+def search_files(search_id: str):
     search = Search.objects.get(id=search_id)
     search_dir = settings.SEARCH_DIRECTORY
     results = []
@@ -31,7 +35,10 @@ def search_files(search_id):
             if zipfile.is_zipfile(file_path):
                 with zipfile.ZipFile(file_path, 'r') as zip_file:
                     for zip_info in zip_file.infolist():
-                          # Применяем фильтры для файлов в архиве
+                        if zip_info.is_dir():
+                            continue
+
+                        # Применяем фильтры для файлов в архиве
                         if not _check_file_matches_filters(
                             zip_info.filename,
                             zip_info.file_size,
@@ -47,7 +54,8 @@ def search_files(search_id):
 
             # Применяем фильтры для обычного файла
             file_size = os.path.getsize(file_path)
-            file_creation_time = datetime.fromtimestamp(os.path.getctime(file_path))
+            file_creation_time = datetime.fromtimestamp(os.path.getctime(file_path), tz=utc)
+
             if not _check_file_matches_filters(file_name, file_size, file_creation_time, search):
                 continue
 
@@ -83,6 +91,7 @@ def _check_file_matches_filters(file_name, file_size, file_creation_time, search
 
     # Проверка времени создания файла
     if search.creation_time_value and file_creation_time:
+        print(search.creation_time_value)
         if not _comprasion_by_wildcards(search.creation_time_value, search.creation_time_operator, file_creation_time):
             return False
 
