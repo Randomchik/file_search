@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.contenttypes',
+    'corsheaders',
     'rest_framework',
     'search',
     'drf_yasg',
@@ -51,6 +52,7 @@ SWAGGER_SETTINGS = {
 MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -135,3 +137,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [],
     'UNAUTHENTICATED_USER': None,
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
